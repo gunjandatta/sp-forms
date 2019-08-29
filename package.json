@@ -1,0 +1,36 @@
+{
+  "name": "sp-forms",
+  "version": "1.0.0",
+  "description": "Custom list forms designed for SharePoint 2013+ Environments. Tested in SharePoint Online.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "webpack --mode=development",
+    "prod": "webpack --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gunjandatta/sp-forms.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gunjandatta/sp-forms/issues"
+  },
+  "homepage": "https://github.com/gunjandatta/sp-forms#readme",
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.2.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^6.0.4",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7"
+  },
+  "dependencies": {
+    "gd-sprest-bs": "^2.2.7"
+  }
+}
