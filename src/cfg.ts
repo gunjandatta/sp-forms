@@ -1,4 +1,4 @@
-import { Helper, List, SPTypes } from "gd-sprest-bs";
+import { ContextInfo, Helper, List, SPTypes, Types } from "gd-sprest-bs";
 
 /** List Name */
 export const ListName = "Custom Forms Demo";
@@ -89,4 +89,65 @@ Configuration["createSampleData"] = () => {
             true
         );
     }
+}
+
+/** Updates the new/edit/display forms */
+Configuration["updateListForms"] = () => {
+    // Method to add the webpart to the form
+    let addWebPart = (form: Types.SP.Form) => {
+        let method: string = "";
+
+        // Determine the type
+        switch (form.FormType) {
+            case SPTypes.PageType.DisplayForm:
+                // Set the method
+                method = "DisplayForm";
+                break;
+            case SPTypes.PageType.EditForm:
+                // Set the method
+                method = "EditForm";
+                break;
+            case SPTypes.PageType.NewForm:
+                // Set the method
+                method = "NewForm";
+                break;
+            // Skip this form by default
+            default:
+                return;
+        }
+
+        // Get the page
+        Helper.WebPart.addWebPartToPage(form.ServerRelativeUrl, {
+            chromeType: "None",
+            title: "List Form",
+            index: 99, // We want to set the index to render the default list form first
+            zone: "Main",
+            content: [
+                '<div id="list-form"></div>',
+                '<script src="' + ContextInfo.webServerRelativeUrl + '/siteassets/sp-forms.js"></script>',
+                '<script>',
+                '// Wait for the sp-forms script to be loaded',
+                'SP.SOD.executeOrDelayUntilScriptLoaded(function() {',
+                '\t// Get the element to render the list form to',
+                '\tvar el = document.querySelector("#list-form");',
+                '',
+                '\t// Render the list form',
+                '\tFormsDemo.' + method + '(el);',
+                '}, "forms-demo");',
+                '</script>'
+            ].join('\n')
+        }).then(() => {
+            // Log
+            console.log("List form '" + method + "' was updated.");
+        });
+    }
+
+    // Get the list forms
+    List("Custom Form Demo").Forms().execute(forms => {
+        // Parse the forms
+        for (let i = 0; i < forms.results.length; i++) {
+            // Add the webpart to the form
+            addWebPart(forms.results[i]);
+        }
+    });
 }
