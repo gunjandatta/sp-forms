@@ -82,7 +82,7 @@ export const DisplayForm = (el: HTMLElement) => {
                         type: Components.ButtonTypes.Secondary,
                         onClick: () => {
                             // Redirect to the display form
-                            document.location.href = document.location.href.replace("/DispForm.aspx", "");
+                            document.location.href = document.location.origin + document.location.pathname.replace("/DispForm.aspx", "");
                         }
                     },
                     {
