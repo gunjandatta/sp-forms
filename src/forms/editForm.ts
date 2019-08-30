@@ -50,7 +50,7 @@ export const EditForm = (el: HTMLElement) => {
     // Render a jumbotron
     Components.Jumbotron({
         el,
-        title: "Session Registration Form",
+        title: "Update Registration",
         content: "Please select a session and time slot."
     });
 

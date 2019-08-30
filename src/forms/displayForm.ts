@@ -17,7 +17,7 @@ export const DisplayForm = (el: HTMLElement) => {
         // Render a jumbotron
         Components.Jumbotron({
             el,
-            title: "Session Registration Form"
+            title: "Session Information"
         });
 
         // Get the list item information

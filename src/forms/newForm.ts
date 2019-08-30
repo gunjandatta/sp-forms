@@ -51,7 +51,7 @@ export const NewForm = (el: HTMLElement) => {
     // Render a jumbotron
     Components.Jumbotron({
         el,
-        title: "Session Registration Form",
+        title: "New Registration",
         content: "Please select a session and time slot."
     });
 
