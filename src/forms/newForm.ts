@@ -1,4 +1,6 @@
 import { Components, Helper, List } from "gd-sprest-bs";
+import { ISessionInfo } from "./index.d";
+import * as Common from "./common";
 
 /**
  * New Form
@@ -6,13 +8,7 @@ import { Components, Helper, List } from "gd-sprest-bs";
 export const NewForm = (el: HTMLElement) => {
     let _ddlSession: Components.IDropdown;
     let _btnCancel: HTMLElement;
-    let _sessionInfo: {
-        [key: string]: Array<{
-            itemId: number;
-            day: string;
-            time: string;
-        }>
-    } = {}
+    let _sessionInfo: { [key: string]: Array<ISessionInfo> } = {}
 
     // Define the click event for the form
     let onSave = () => {
@@ -49,31 +45,8 @@ export const NewForm = (el: HTMLElement) => {
         }
     }
 
-    // Get the list form webpart element
-    let elWebpart = document.querySelector(".ms-webpart-zone > div[id^='MSOZoneCell']") as HTMLElement;
-    if (elWebpart) {
-        // Hide the default list form
-        elWebpart.style.display = "none";
-
-        /*********************************************************************************
-         * The ribbon "Save" button click event is linked to the save buttons.
-         * We will need to update the click events of the default save buttons to the
-         * new custom one.
-         ********************************************************************************/
-
-        // Get the "Save" buttons
-        let elButtons = elWebpart.querySelectorAll("input[value='Save']");
-        for (let i = 0; i < elButtons.length; i++) {
-            // Remove the default click event
-            (elButtons[i] as HTMLInputElement).removeAttribute("onclick");
-
-            // Set the click event to the custom save method
-            (elButtons[i] as HTMLInputElement).addEventListener("click", onSave);
-        }
-
-        // Get the "Cancel" button
-        _btnCancel = elWebpart.querySelector("input[value='Cancel']");
-    }
+    // Initialize the form
+    _btnCancel = Common.initForm(onSave);
 
     // Render a jumbotron
     Components.Jumbotron({
@@ -114,7 +87,7 @@ export const NewForm = (el: HTMLElement) => {
                             // Query the session list
                             List("Sessions").Items().query({
                                 OrderBy: ["Title", "SessionDay", "SessionTime"],
-                                Select: ["Title", "SessionDay", "SessionTime"]
+                                Select: ["Id", "Title", "SessionDay", "SessionTime"]
                             }).execute(items => {
                                 // Set the default item
                                 props.items = [{
@@ -212,7 +185,7 @@ export const NewForm = (el: HTMLElement) => {
                 }
             },
             {
-                text: "Register",
+                text: "Create Registration",
                 type: Components.ButtonTypes.Primary,
                 onClick: onSave
             }
