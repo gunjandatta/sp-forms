@@ -31,7 +31,14 @@ export const Configuration = Helper.SPConfig({
                     title: "Session Capacity",
                     type: Helper.SPCfgFieldType.Number,
                     numberType: SPTypes.FieldNumberType.Integer
-                } as Helper.IFieldInfoNumber
+                } as Helper.IFieldInfoNumber,
+                {
+                    name: "SessionInfo",
+                    title: "Session Information",
+                    type: Helper.SPCfgFieldType.Calculated,
+                    fieldRefs: ["SessionDay", "SessionTime"],
+                    formula: '=[Session Day]&amp;" - "&amp;[Session Time]'
+                } as Helper.IFieldInfoCalculated
             ],
             ViewInformation: [
                 {
@@ -54,6 +61,12 @@ export const Configuration = Helper.SPConfig({
                     listName: "Sessions",
                     showField: "Title"
                 } as Helper.IFieldInfoLookup
+            ],
+            ViewInformation: [
+                {
+                    ViewName: "All Items",
+                    ViewFields: ["LinkTitle", "SessionsLU"]
+                }
             ]
         }
     ]
