@@ -81,6 +81,10 @@ export const NewForm = (el: HTMLElement) => {
                             invalidMessage: "Please select a session."
                         };
                     },
+                    onChange: (item: Components.IDropdownItem) => {
+                        // Update the sessions
+                        Common.updateSessions(_ddlSession, item ? item.data : null);
+                    },
                     onControlRendering: (props: Components.IFormControlPropsDropdown) => {
                         // Return a promise, while we load the session information
                         return new Promise((resolve, reject) => {
@@ -127,26 +131,6 @@ export const NewForm = (el: HTMLElement) => {
                                 resolve(props);
                             });
                         });
-                    },
-                    onChange: (item: Components.IDropdownItem) => {
-                        let items: Array<Components.IDropdownItem> = [];
-
-                        // Ensure an item was selected
-                        if (item != null && item.data != null) {
-                            // Parse the data
-                            for (let i = 0; i < item.data.length; i++) {
-                                let sessionInfo = item.data[i];
-
-                                // Add a dropdown item for this session
-                                items.push({
-                                    text: sessionInfo.day + " - " + sessionInfo.time,
-                                    value: sessionInfo.itemId
-                                });
-                            }
-                        }
-
-                        // Update the dropdown
-                        _ddlSession.setItems(items);
                     }
                 } as Components.IFormControlPropsDropdown
             },

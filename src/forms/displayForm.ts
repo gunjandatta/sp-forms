@@ -25,7 +25,7 @@ export const DisplayForm = (el: HTMLElement) => {
         // You cannot expand "choice" fields, which is why a "calculated" field was created
         List("Custom Form Demo").Items(Common.getItemID()).query({
             Expand: ["SessionsLU"],
-            Select: ["Title", "SessionsLU/Title", "SessionsLU/SessionInfo"]
+            Select: ["Id", "Title", "SessionsLU/Title", "SessionsLU/SessionInfo"]
         }).execute(item => {
             // Get the session day/time information
             let day, time = null;
@@ -90,7 +90,7 @@ export const DisplayForm = (el: HTMLElement) => {
                         type: Components.ButtonTypes.Primary,
                         onClick: () => {
                             // Redirect to the edit form
-                            document.location.href = document.location.href.replace("/DispForm.aspx", "/EditForm.aspx");
+                            document.location.href = "EditForm.aspx?ID=" + item.Id;
                         }
                     }
                 ]
