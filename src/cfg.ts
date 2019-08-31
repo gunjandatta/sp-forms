@@ -129,7 +129,7 @@ Configuration["updateListForms"] = () => {
                 return;
         }
 
-        // Get the page
+        // Add a script editor webpart to the list item form
         Helper.WebPart.addWebPartToPage(form.ServerRelativeUrl, {
             chromeType: "None",
             title: "List Form",
