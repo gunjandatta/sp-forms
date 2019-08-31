@@ -156,7 +156,7 @@ Configuration["updateListForms"] = () => {
     }
 
     // Get the list forms
-    List("Custom Form Demo").Forms().execute(forms => {
+    List(ListName).Forms().execute(forms => {
         // Parse the forms
         for (let i = 0; i < forms.results.length; i++) {
             // Add the webpart to the form
