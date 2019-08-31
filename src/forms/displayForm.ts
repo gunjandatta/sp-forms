@@ -1,4 +1,5 @@
 import { Components, Helper, List } from "gd-sprest-bs";
+import { ListName } from "../cfg";
 import * as Common from "./common"
 
 /**
@@ -23,7 +24,7 @@ export const DisplayForm = (el: HTMLElement) => {
         // Get the list item information
         // We are expanding the lookup field to include the "calculated" information field
         // You cannot expand "choice" fields, which is why a "calculated" field was created
-        List("Custom Form Demo").Items(Common.getItemID()).query({
+        List(ListName).Items(Common.getItemID()).query({
             Expand: ["SessionsLU"],
             Select: ["Id", "Title", "SessionsLU/Title", "SessionsLU/SessionInfo"]
         }).execute(item => {

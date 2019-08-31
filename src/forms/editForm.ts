@@ -1,4 +1,5 @@
 import { Components, Helper, Web } from "gd-sprest-bs";
+import { ListName } from "../cfg";
 import { ISessionInfo } from "./index.d";
 import * as Common from "./common";
 
@@ -21,7 +22,7 @@ export const EditForm = (el: HTMLElement) => {
             let values = form.getValues();
 
             // Update the item
-            Web().Lists("Custom Form Demo").Items(_itemId).update({
+            Web().Lists(ListName).Items(_itemId).update({
                 SessionsLUId: values["SelectedSession"].value
             }).execute(
                 // Success
@@ -92,7 +93,7 @@ export const EditForm = (el: HTMLElement) => {
                             let selectedSession = null;
 
                             // Get the current list item
-                            web.Lists("Custom Form Demo").Items(_itemId).query({
+                            web.Lists(ListName).Items(_itemId).query({
                                 Expand: ["SessionsLU"],
                                 Select: ["Title", "SessionsLUId", "SessionsLU/Title", "SessionsLU/SessionInfo"]
                             }).execute(item => {

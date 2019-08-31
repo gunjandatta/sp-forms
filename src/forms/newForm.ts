@@ -1,4 +1,5 @@
 import { Components, Helper, List } from "gd-sprest-bs";
+import { ListName } from "../cfg";
 import { ISessionInfo } from "./index.d";
 import * as Common from "./common";
 
@@ -21,7 +22,7 @@ export const NewForm = (el: HTMLElement) => {
             let values = form.getValues();
 
             // Add a new item
-            List("Custom Form Demo").Items().add({
+            List(ListName).Items().add({
                 Title: "View Registration",
                 SessionsLUId: values["SelectedSession"].value
             }).execute(
