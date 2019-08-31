@@ -50,7 +50,7 @@ export const Configuration = Helper.SPConfig({
         /** List with Custom Forms */
         {
             ListInformation: {
-                Title: "Custom Form Demo",
+                Title: ListName,
                 BaseTemplate: SPTypes.ListTemplateType.GenericList
             },
             CustomFields: [
