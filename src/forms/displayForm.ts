@@ -48,7 +48,7 @@ export class DisplayForm {
                 },
                 {
                     control: {
-                        label: "Session Time:",
+                        label: "Session Information:",
                         type: Components.FormControlTypes.TextField,
                         isReadonly: true,
                         value: sessionInfo["SessionInfo"]
