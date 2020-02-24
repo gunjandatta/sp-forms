@@ -145,7 +145,7 @@ export class EditForm {
 
                                     // Parse the session information
                                     for (let sessionName in this._sessionInfo) {
-                                        // Add A dropdown item for this session
+                                        // Add a dropdown item for this session
                                         props.items.push({
                                             data: this._sessionInfo[sessionName],
                                             isSelected: sessionName == selectedSession,

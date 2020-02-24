@@ -31,7 +31,7 @@ export class DisplayForm {
             title: "Session Information"
         });
 
-        // Set the sesion information
+        // Set the session information
         let sessionInfo = item["SessionsLU"] || {};
 
         // Render the form
