@@ -1,7 +1,10 @@
 import { ContextInfo, Helper, List, SPTypes, Types } from "gd-sprest-bs";
 
 /** List Name */
-export const ListName = "Custom Forms Demo";
+export const ListNames = {
+    Configuration: "Sessions",
+    Main: "Custom Forms Demo"
+};
 
 /** Configuration */
 export const Configuration = Helper.SPConfig({
@@ -10,7 +13,7 @@ export const Configuration = Helper.SPConfig({
         /** Associated list with session information. */
         {
             ListInformation: {
-                Title: "Sessions",
+                Title: ListNames.Configuration,
                 BaseTemplate: SPTypes.ListTemplateType.GenericList
             },
             CustomFields: [
@@ -50,7 +53,7 @@ export const Configuration = Helper.SPConfig({
         /** List with Custom Forms */
         {
             ListInformation: {
-                Title: ListName,
+                Title: ListNames.Main,
                 BaseTemplate: SPTypes.ListTemplateType.GenericList
             },
             CustomFields: [
@@ -89,7 +92,7 @@ Configuration["createSampleData"] = () => {
         let idx3 = generateIndex(0, times.length - 1);
 
         // Add the list item
-        List("Sessions").Items().add({
+        List(ListNames.Configuration).Items().add({
             Title: classNames[idx1],
             SessionDay: sessions[idx2],
             SessionTime: times[idx3],
@@ -145,7 +148,7 @@ Configuration["updateListForms"] = () => {
                 '\tvar el = document.querySelector("#list-form");',
                 '',
                 '\t// Render the list form',
-                '\tFormsDemo.' + method + '(el);',
+                '\tnew FormsDemo.' + method + '(el);',
                 '}, "forms-demo");',
                 '</script>'
             ].join('\n')
@@ -156,7 +159,7 @@ Configuration["updateListForms"] = () => {
     }
 
     // Get the list forms
-    List(ListName).Forms().execute(forms => {
+    List(ListNames.Main).Forms().execute(forms => {
         // Parse the forms
         for (let i = 0; i < forms.results.length; i++) {
             // Add the webpart to the form

@@ -1,196 +1,225 @@
 import { Components, Helper, Web } from "gd-sprest-bs";
-import { ListName } from "../cfg";
-import { ISessionInfo } from "./index.d";
-import * as Common from "./common";
+import { ListNames } from "../cfg";
+import * as DataSource from "./ds";
 
 /**
  * Edit Form
  */
-export const EditForm = (el: HTMLElement) => {
-    let _ddlSession: Components.IDropdown;
-    let _itemId = Common.getItemID();
-    let _sessionInfo: { [key: string]: Array<ISessionInfo> } = {}
+export class EditForm {
+    // Constructor
+    constructor(el: HTMLElement) {
+        // Initialize the form
+        this._btnCancel = DataSource.initForm(this.onSave);
+
+        // Set the item id
+        this._itemId = DataSource.getItemID();
+
+        // See if this is a new form
+        if (this._itemId > 0) {
+            // Get the item information
+            DataSource.getSession(this._itemId).then(session => {
+                // Render the form
+                this.render(el, session);
+            });
+        } else {
+            // Render the form
+            this.render(el);
+        }
+    }
+
+    // Global Variables
+    private _btnCancel: HTMLElement;
+    private _ddlSession: Components.IDropdown;
+    private _errorMessage: Components.IAlert;
+    private _form: Components.IForm;
+    private _itemId: number;
+    private _sessionInfo: { [key: string]: Array<Components.IDropdownItem> } = {}
 
     // Define the click event for the form
-    let onSave = () => {
+    private onSave() {
         // Ensure the form is valid
-        if (form.isValid()) {
+        if (this._form.isValid()) {
             // Display the saving dialog
             Helper.SP.ModalDialog.showWaitScreenWithNoClose("Saving the Registration", "This will close automatically");
 
             // Get the values
-            let values = form.getValues();
+            let values = this._form.getValues();
 
-            // Update the item
-            Web().Lists(ListName).Items(_itemId).update({
-                SessionsLUId: values["SelectedSession"].value
-            }).execute(
-                // Success
-                () => {
-                    // Close the dialog
-                    Helper.SP.ModalDialog.commonModalDialogClose();
+            // on Success event
+            let onSuccess = () => {
+                // Close the dialog
+                Helper.SP.ModalDialog.commonModalDialogClose();
 
-                    // Show the display form
-                    document.location.href = "DispForm.aspx?ID=" + _itemId;
-                },
-                // Error
-                () => {
-                    // Close the dialog
-                    Helper.SP.ModalDialog.commonModalDialogClose();
+                // Show the display form
+                document.location.href = "DispForm.aspx?ID=" + this._itemId;
+            };
 
-                    // Display the alert
-                    errorMessage.el.classList.remove("d-none");
-                }
-            );
+            // on Error event
+            let onError = () => {
+                // Close the dialog
+                Helper.SP.ModalDialog.commonModalDialogClose();
+
+                // Display the alert
+                this._errorMessage.show();
+            }
+
+            // See if this is an existing item
+            if (this._itemId > 0) {
+                // Update the selected session
+                Web().Lists(ListNames.Main).Items(this._itemId).update({
+                    SessionsLUId: values["SelectedSession"].value
+                }).execute(onSuccess, onError);
+            } else {
+                // Add the session
+                Web().Lists(ListNames.Main).Items().add({
+                    Title: "View Registration",
+                    SessionsLUId: values["SelectedSession"].value
+                }).execute(item => {
+                    // Set the item id
+                    this._itemId = item.Id;
+
+                    // Call the success event
+                    onSuccess();
+                }, onError);
+            }
+
         }
     }
 
-    // Initialize the form
-    Common.initForm(onSave);
+    // Renders the form
+    private render(el: HTMLElement, item?) {
+        // Render a jumbotron
+        Components.Jumbotron({
+            el,
+            title: (item ? "Update" : "Create") + " Registration",
+            content: "Please select a session and time slot."
+        });
 
-    // Render a jumbotron
-    Components.Jumbotron({
-        el,
-        title: "Update Registration",
-        content: "Please select a session and time slot."
-    });
+        // Error message for new form
+        this._errorMessage = Components.Alert({
+            el,
+            className: "d-none",
+            type: Components.AlertTypes.Danger,
+            header: "Error Registering Session",
+            content: "There was an error updating your registration. Please try again."
+        });
 
-    // Error message for new form
-    let errorMessage = Components.Alert({
-        el,
-        className: "d-none",
-        type: Components.AlertTypes.Danger,
-        header: "Error Registering Session",
-        content: "There was an error updating your registration. Please try again."
-    });
+        // Generate the form
+        this._form = Components.Form({
+            el,
+            rows: [
+                {
+                    control: {
+                        name: "Session",
+                        label: "Select a Session",
+                        type: Components.FormControlTypes.Dropdown,
+                        required: true,
+                        loadingMessage: "Loading the Session Information",
+                        onValidate: (control, item: Components.IDropdownItem) => {
+                            return {
+                                isValid: item && item.value.length > 0 ? true : false,
+                                invalidMessage: "Please select a session."
+                            };
+                        },
+                        onChange: (item: Components.IDropdownItem) => {
+                            // Update the sessions
+                            this._ddlSession.setItems(item.data);
+                        },
+                        onControlRendering: (props: Components.IFormControlPropsDropdown) => {
+                            // Return a promise, while we load the session information
+                            return new Promise((resolve, reject) => {
+                                // Get the sessions
+                                DataSource.getSessions().then(sessions => {
+                                    // Save the session information
+                                    this._sessionInfo = sessions;
 
-    // Generate the form
-    let form = Components.Form({
-        el,
-        rows: [
-            {
-                control: {
-                    name: "Session",
-                    label: "Select a Session",
-                    type: Components.FormControlTypes.Dropdown,
-                    required: true,
-                    loadingMessage: "Loading the Session Information",
-                    onValidate: (control, item: Components.IDropdownItem) => {
-                        return {
-                            isValid: item && item.value.length > 0 ? true : false,
-                            invalidMessage: "Please select a session."
-                        };
-                    },
-                    onChange: (item: Components.IDropdownItem) => {
-                        // Update the sessions
-                        Common.updateSessions(_ddlSession, item ? item.data : null);
-                    },
-                    onControlRendering: (props: Components.IFormControlPropsDropdown) => {
-                        // Return a promise, while we load the session information
-                        return new Promise((resolve, reject) => {
-                            let web = Web();
-                            let selectedItem = null;
-                            let selectedSession = null;
+                                    // Set the selected value
+                                    let selectedSession = item && item["SessionsLU"];
+                                    selectedSession = selectedSession ? selectedSession["Title"] : null;
 
-                            // Get the current list item
-                            web.Lists(ListName).Items(_itemId).query({
-                                Expand: ["SessionsLU"],
-                                Select: ["Title", "SessionsLUId", "SessionsLU/Title", "SessionsLU/SessionInfo"]
-                            }).execute(item => {
-                                // Save the selected session
-                                selectedItem = item;
-                                selectedSession = item["SessionsLU"]["Title"];
-                            });
+                                    // Set the default item
+                                    props.items = [{
+                                        data: [],
+                                        text: "Select a Session",
+                                        value: ""
+                                    }];
 
-                            // Query the session list
-                            web.Lists("Sessions").Items().query({
-                                OrderBy: ["Title", "SessionDay", "SessionTime"],
-                                Select: ["Id", "Title", "SessionDay", "SessionTime"]
-                            }).execute(items => {
-                                // Set the default item
-                                props.items = [{
-                                    text: "Select a Session",
-                                    value: ""
-                                }];
-
-                                // Parse the items
-                                for (let i = 0; i < items.results.length; i++) {
-                                    let item = items.results[i];
-
-                                    // Get the session name
-                                    let session = item["Title"];
-
-                                    // Ensure the key exists
-                                    if (_sessionInfo[session] == null) {
-                                        // Create an array for this session
-                                        _sessionInfo[session] = [];
-
-                                        // Create a dropdown option for this session
+                                    // Parse the session information
+                                    for (let sessionName in this._sessionInfo) {
+                                        // Add A dropdown item for this session
                                         props.items.push({
-                                            data: _sessionInfo[session],
-                                            isSelected: session == selectedSession,
-                                            text: session,
-                                            value: session
+                                            data: this._sessionInfo[sessionName],
+                                            isSelected: sessionName == selectedSession,
+                                            text: sessionName,
+                                            value: sessionName
                                         });
                                     }
 
-                                    // Append the day and time
-                                    _sessionInfo[session].push({
-                                        itemId: item.Id,
-                                        day: item["SessionDay"],
-                                        time: item["SessionTime"]
-                                    });
-                                }
+                                    // Get the existing session items
+                                    let selectedSessionTimes = this._sessionInfo[selectedSession];
+                                    if (selectedSessionTimes) {
+                                        // Parse the items
+                                        for (let i = 0; i < selectedSessionTimes.length; i++) {
+                                            let session = selectedSessionTimes[i];
 
-                                // Resolve the promise
-                                resolve(props);
+                                            // Set the selected flag
+                                            session.isSelected = session.value == item["SessionsLUId"];
+                                        }
+                                    }
 
-                                // Update the sessions
-                                Common.updateSessions(_ddlSession, _sessionInfo[selectedSession], selectedItem.Id)
-                            }, true); // Setting true will wait for the previous request to complete
-                        });
-                    }
-                } as Components.IFormControlPropsDropdown
-            },
-            {
-                control: {
-                    name: "SelectedSession",
-                    label: "Available Sessions",
-                    type: Components.FormControlTypes.Dropdown,
-                    onValidate: (control, item: Components.IDropdownItem) => {
-                        // Ensure a value exists
-                        return {
-                            isValid: item != null,
-                            invalidMessage: "Please select an available slot."
-                        };
-                    },
-                    onControlRendered: control => {
-                        // Save a reference to this control
-                        _ddlSession = control.get() as any;
-                    }
-                } as Components.IFormControlPropsDropdown
-            }
-        ]
-    });
+                                    // Update the items
+                                    this._ddlSession.setItems(selectedSessionTimes);
 
-    // Render the form buttons
-    Components.ButtonGroup({
-        el,
-        buttons: [
-            {
-                className: "mr-2",
-                text: "Cancel",
-                type: Components.ButtonTypes.Danger,
-                onClick: () => {
-                    // Redirect to the edit form
-                    document.location.href = "DispForm.aspx?ID=" + _itemId;
+                                    // Resolve the properties
+                                    resolve(props);
+                                });
+                            });
+                        }
+                    } as Components.IFormControlPropsDropdown
+                },
+                {
+                    control: {
+                        name: "SelectedSession",
+                        label: "Available Sessions",
+                        type: Components.FormControlTypes.Dropdown,
+                        onValidate: (control, item: Components.IDropdownItem) => {
+                            // Ensure a value exists
+                            return {
+                                isValid: item != null,
+                                invalidMessage: "Please select an available slot."
+                            };
+                        },
+                        onControlRendered: control => {
+                            // Save a reference to this control
+                            this._ddlSession = control.get() as any;
+                        }
+                    } as Components.IFormControlPropsDropdown
                 }
-            },
-            {
-                text: "Update Registration",
-                type: Components.ButtonTypes.Primary,
-                onClick: onSave
-            }
-        ]
-    });
+            ]
+        });
+
+        // Render the form buttons
+        Components.ButtonGroup({
+            el,
+            buttons: [
+                {
+                    className: "mr-2",
+                    text: "Cancel",
+                    type: Components.ButtonTypes.Danger,
+                    onClick: () => {
+                        // Cancel the request
+                        this._btnCancel.click();
+                    }
+                },
+                {
+                    text: (item ? "Update" : "Create") + " Registration",
+                    type: Components.ButtonTypes.Primary,
+                    onClick: () => {
+                        // Save the request
+                        this.onSave();
+                    }
+                }
+            ]
+        });
+    }
 }

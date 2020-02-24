@@ -1,104 +1,84 @@
-import { Components, Helper, List } from "gd-sprest-bs";
-import { ListName } from "../cfg";
-import * as Common from "./common"
+import { Components, Helper } from "gd-sprest-bs";
+import * as DataSource from "./ds"
 
 /**
  * Display Form
  */
-export const DisplayForm = (el: HTMLElement) => {
-    // Display a loading message
-    Helper.SP.ModalDialog.showWaitScreenWithNoClose("Loading the Registration").then(dlg => {
-        // Get the list form webpart element
-        let elWebpart = document.querySelector(".ms-webpart-zone > div[id^='MSOZoneCell']") as HTMLElement;
-        if (elWebpart) {
-            // Hide the default list form
-            elWebpart.style.display = "none";
-        }
+export class DisplayForm {
+    // Constructor
+    constructor(el: HTMLElement) {
+        // Hide the default form
+        DataSource.hideDefaultForm();
 
+        // Display a loading message
+        Helper.SP.ModalDialog.showWaitScreenWithNoClose("Loading the Registration").then(dlg => {
+            // Get the session information
+            DataSource.getSession(DataSource.getItemID()).then(session => {
+                // Render the form
+                this.render(el, session);
+
+                // Close the dialog
+                dlg.close();
+            });
+        });
+    }
+
+    // Renders the form
+    private render(el: HTMLElement, item) {
         // Render a jumbotron
         Components.Jumbotron({
             el,
             title: "Session Information"
         });
 
-        // Get the list item information
-        // We are expanding the lookup field to include the "calculated" information field
-        // You cannot expand "choice" fields, which is why a "calculated" field was created
-        List(ListName).Items(Common.getItemID()).query({
-            Expand: ["SessionsLU"],
-            Select: ["Id", "Title", "SessionsLU/Title", "SessionsLU/SessionInfo"]
-        }).execute(item => {
-            // Get the session day/time information
-            let day, time = null;
-            let luItem = item["SessionsLU"] || null;
-            if (luItem) {
-                let sessionInfo = (luItem["SessionInfo"] || "").split(" - ");
-                day = sessionInfo[0];
-                time = sessionInfo[1];
-            }
+        // Set the sesion information
+        let sessionInfo = item["SessionsLU"] || {};
 
-            // Render the form
-            Components.Form({
-                el,
-                value: {
-                    Session: luItem ? luItem["Title"] : "",
-                    SessionDay: day || "",
-                    SessionTime: time || ""
+        // Render the form
+        Components.Form({
+            el,
+            rows: [
+                {
+                    control: {
+                        label: "Registered Session:",
+                        type: Components.FormControlTypes.TextField,
+                        isReadonly: true,
+                        value: sessionInfo["Title"]
+                    }
                 },
-                rows: [
-                    {
-                        control: {
-                            name: "Session",
-                            label: "Registered Session:",
-                            type: Components.FormControlTypes.TextField,
-                            isReadonly: true
-                        }
-                    },
-                    {
-                        control: {
-                            name: "SessionDay",
-                            label: "Session Day:",
-                            type: Components.FormControlTypes.TextField,
-                            isReadonly: true
-                        }
-                    },
-                    {
-                        control: {
-                            name: "SessionTime",
-                            label: "Session Time:",
-                            type: Components.FormControlTypes.TextField,
-                            isReadonly: true
-                        }
+                {
+                    control: {
+                        label: "Session Time:",
+                        type: Components.FormControlTypes.TextField,
+                        isReadonly: true,
+                        value: sessionInfo["SessionInfo"]
                     }
-                ]
-            });
-
-            // Render the form buttons
-            Components.ButtonGroup({
-                el,
-                buttons: [
-                    {
-                        className: "mr-2",
-                        text: "View Registrations",
-                        type: Components.ButtonTypes.Secondary,
-                        onClick: () => {
-                            // Redirect to the display form
-                            document.location.href = document.location.origin + document.location.pathname.replace("/DispForm.aspx", "");
-                        }
-                    },
-                    {
-                        text: "Edit Registration",
-                        type: Components.ButtonTypes.Primary,
-                        onClick: () => {
-                            // Redirect to the edit form
-                            document.location.href = "EditForm.aspx?ID=" + item.Id;
-                        }
-                    }
-                ]
-            });
-
-            // Close the dialog
-            dlg.close();
+                }
+            ]
         });
-    });
+
+        // Render the form buttons
+        Components.ButtonGroup({
+            el,
+            buttons: [
+                {
+                    className: "mr-2",
+                    text: "View Registrations",
+                    type: Components.ButtonTypes.Secondary,
+                    onClick: () => {
+                        // Redirect to the display form
+                        document.location.href = document.location.origin + document.location.pathname.replace("/DispForm.aspx", "");
+                    }
+                },
+                {
+                    text: "Edit Registration",
+                    type: Components.ButtonTypes.Primary,
+                    onClick: () => {
+                        // Redirect to the edit form
+                        document.location.href = "EditForm.aspx?ID=" + item.Id;
+                    }
+                }
+            ]
+        });
+    }
 }
