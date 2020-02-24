@@ -82,7 +82,6 @@ export class EditForm {
                     onSuccess();
                 }, onError);
             }
-
         }
     }
 
