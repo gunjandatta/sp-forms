@@ -31,6 +31,6 @@
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
-    "gd-sprest-bs": "^2.9.6"
+    "gd-sprest-bs": "^3.0.7"
   }
 }

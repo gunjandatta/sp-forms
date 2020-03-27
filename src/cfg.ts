@@ -133,7 +133,7 @@ Configuration["updateListForms"] = () => {
         }
 
         // Add a script editor webpart to the list item form
-        Helper.WebPart.addWebPartToPage(form.ServerRelativeUrl, {
+        Helper.addScriptEditorWebPart(form.ServerRelativeUrl, {
             chromeType: "None",
             title: "List Form",
             index: 99, // We want to set the index to render the default list form first
