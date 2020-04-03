@@ -108,91 +108,95 @@ export class EditForm {
             el,
             rows: [
                 {
-                    control: {
-                        name: "Session",
-                        label: "Select a Session",
-                        type: Components.FormControlTypes.Dropdown,
-                        required: true,
-                        loadingMessage: "Loading the Session Information",
-                        onValidate: (control, item: Components.IDropdownItem) => {
-                            return {
-                                isValid: item && item.value.length > 0 ? true : false,
-                                invalidMessage: "Please select a session."
-                            };
-                        },
-                        onChange: (item: Components.IDropdownItem) => {
-                            // Update the sessions
-                            this._ddlSession.setItems(item.data);
-                        },
-                        onControlRendering: (props: Components.IFormControlPropsDropdown) => {
-                            // Return a promise, while we load the session information
-                            return new Promise((resolve, reject) => {
-                                // Get the sessions
-                                DataSource.getSessions().then(sessions => {
-                                    // Save the session information
-                                    this._sessionInfo = sessions;
+                    columns: [
+                        {
+                            control: {
+                                name: "Session",
+                                label: "Select a Session",
+                                type: Components.FormControlTypes.Dropdown,
+                                required: true,
+                                loadingMessage: "Loading the Session Information",
+                                onValidate: (control, item: Components.IDropdownItem) => {
+                                    return {
+                                        isValid: item && item.value.length > 0 ? true : false,
+                                        invalidMessage: "Please select a session."
+                                    };
+                                },
+                                onChange: (item: Components.IDropdownItem) => {
+                                    // Update the sessions
+                                    this._ddlSession.setItems(item.data);
+                                },
+                                onControlRendering: (props: Components.IFormControlPropsDropdown) => {
+                                    // Return a promise, while we load the session information
+                                    return new Promise((resolve, reject) => {
+                                        // Get the sessions
+                                        DataSource.getSessions().then(sessions => {
+                                            // Save the session information
+                                            this._sessionInfo = sessions;
 
-                                    // Set the selected value
-                                    let selectedSession = item && item["SessionsLU"];
-                                    selectedSession = selectedSession ? selectedSession["Title"] : null;
+                                            // Set the selected value
+                                            let selectedSession = item && item["SessionsLU"];
+                                            selectedSession = selectedSession ? selectedSession["Title"] : null;
 
-                                    // Set the default item
-                                    props.items = [{
-                                        data: [],
-                                        text: "Select a Session",
-                                        value: ""
-                                    }];
+                                            // Set the default item
+                                            props.items = [{
+                                                data: [],
+                                                text: "Select a Session",
+                                                value: ""
+                                            }];
 
-                                    // Parse the session information
-                                    for (let sessionName in this._sessionInfo) {
-                                        // Add a dropdown item for this session
-                                        props.items.push({
-                                            data: this._sessionInfo[sessionName],
-                                            isSelected: sessionName == selectedSession,
-                                            text: sessionName,
-                                            value: sessionName
+                                            // Parse the session information
+                                            for (let sessionName in this._sessionInfo) {
+                                                // Add a dropdown item for this session
+                                                props.items.push({
+                                                    data: this._sessionInfo[sessionName],
+                                                    isSelected: sessionName == selectedSession,
+                                                    text: sessionName,
+                                                    value: sessionName
+                                                });
+                                            }
+
+                                            // Get the existing session items
+                                            let selectedSessionTimes = this._sessionInfo[selectedSession];
+                                            if (selectedSessionTimes) {
+                                                // Parse the items
+                                                for (let i = 0; i < selectedSessionTimes.length; i++) {
+                                                    let session = selectedSessionTimes[i];
+
+                                                    // Set the selected flag
+                                                    session.isSelected = session.value == item["SessionsLUId"];
+                                                }
+                                            }
+
+                                            // Update the items
+                                            this._ddlSession.setItems(selectedSessionTimes);
+
+                                            // Resolve the properties
+                                            resolve(props);
                                         });
-                                    }
-
-                                    // Get the existing session items
-                                    let selectedSessionTimes = this._sessionInfo[selectedSession];
-                                    if (selectedSessionTimes) {
-                                        // Parse the items
-                                        for (let i = 0; i < selectedSessionTimes.length; i++) {
-                                            let session = selectedSessionTimes[i];
-
-                                            // Set the selected flag
-                                            session.isSelected = session.value == item["SessionsLUId"];
-                                        }
-                                    }
-
-                                    // Update the items
-                                    this._ddlSession.setItems(selectedSessionTimes);
-
-                                    // Resolve the properties
-                                    resolve(props);
-                                });
-                            });
-                        }
-                    } as Components.IFormControlPropsDropdown
-                },
-                {
-                    control: {
-                        name: "SelectedSession",
-                        label: "Available Sessions",
-                        type: Components.FormControlTypes.Dropdown,
-                        onValidate: (control, item: Components.IDropdownItem) => {
-                            // Ensure a value exists
-                            return {
-                                isValid: item != null,
-                                invalidMessage: "Please select an available slot."
-                            };
+                                    });
+                                }
+                            } as Components.IFormControlPropsDropdown
                         },
-                        onControlRendered: control => {
-                            // Save a reference to this control
-                            this._ddlSession = control.get() as any;
+                        {
+                            control: {
+                                name: "SelectedSession",
+                                label: "Available Sessions",
+                                type: Components.FormControlTypes.Dropdown,
+                                onValidate: (control, item: Components.IDropdownItem) => {
+                                    // Ensure a value exists
+                                    return {
+                                        isValid: item != null,
+                                        invalidMessage: "Please select an available slot."
+                                    };
+                                },
+                                onControlRendered: control => {
+                                    // Save a reference to this control
+                                    this._ddlSession = control.dropdown;
+                                }
+                            } as Components.IFormControlPropsDropdown
                         }
-                    } as Components.IFormControlPropsDropdown
+                    ]
                 }
             ]
         });

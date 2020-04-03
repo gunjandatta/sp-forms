@@ -140,7 +140,7 @@ Configuration["updateListForms"] = () => {
             zone: "Main",
             content: [
                 '<div id="list-form"></div>',
-                '<script src="' + ContextInfo.webServerRelativeUrl + '/siteassets/sp-forms.js"></script>',
+                '<script src="' + ContextInfo.webServerRelativeUrl + '/siteassets/sp-examples/sp-forms.js"></script>',
                 '<script>',
                 '// Wait for the sp-forms script to be loaded',
                 'SP.SOD.executeOrDelayUntilScriptLoaded(function() {',

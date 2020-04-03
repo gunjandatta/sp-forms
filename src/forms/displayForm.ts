@@ -39,20 +39,24 @@ export class DisplayForm {
             el,
             rows: [
                 {
-                    control: {
-                        label: "Registered Session:",
-                        type: Components.FormControlTypes.TextField,
-                        isReadonly: true,
-                        value: sessionInfo["Title"]
-                    }
-                },
-                {
-                    control: {
-                        label: "Session Information:",
-                        type: Components.FormControlTypes.TextField,
-                        isReadonly: true,
-                        value: sessionInfo["SessionInfo"]
-                    }
+                    columns: [
+                        {
+                            control: {
+                                label: "Registered Session:",
+                                type: Components.FormControlTypes.TextField,
+                                isReadonly: true,
+                                value: sessionInfo["Title"]
+                            }
+                        },
+                        {
+                            control: {
+                                label: "Session Information:",
+                                type: Components.FormControlTypes.TextField,
+                                isReadonly: true,
+                                value: sessionInfo["SessionInfo"]
+                            }
+                        }
+                    ]
                 }
             ]
         });
