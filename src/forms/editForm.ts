@@ -106,6 +106,7 @@ export class EditForm {
         // Generate the form
         this._form = Components.Form({
             el,
+            value: item,
             rows: [
                 {
                     columns: [
@@ -116,11 +117,15 @@ export class EditForm {
                                 type: Components.FormControlTypes.Dropdown,
                                 required: true,
                                 loadingMessage: "Loading the Session Information",
-                                onValidate: (control, item: Components.IDropdownItem) => {
-                                    return {
-                                        isValid: item && item.value.length > 0 ? true : false,
-                                        invalidMessage: "Please select a session."
-                                    };
+                                onValidate: (control, results) => {
+                                    let item = results.value;
+
+                                    // Set the falg
+                                    results.isValid = item && item.value.length > 0;
+                                    results.invalidMessage = "Please select a session.";
+
+                                    // Return the results
+                                    return results;
                                 },
                                 onChange: (item: Components.IDropdownItem) => {
                                     // Update the sessions
@@ -183,12 +188,13 @@ export class EditForm {
                                 name: "SelectedSession",
                                 label: "Available Sessions",
                                 type: Components.FormControlTypes.Dropdown,
-                                onValidate: (control, item: Components.IDropdownItem) => {
-                                    // Ensure a value exists
-                                    return {
-                                        isValid: item != null,
-                                        invalidMessage: "Please select an available slot."
-                                    };
+                                onValidate: (control, results) => {
+                                    // Set the flag
+                                    results.isValid = results.value != null;
+                                    results.invalidMessage = "Please select an available slot.";
+
+                                    // Return the results
+                                    return results;
                                 },
                                 onControlRendered: control => {
                                     // Save a reference to this control
